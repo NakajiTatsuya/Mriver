@@ -1,4 +1,4 @@
-// 任意の条件にマッチしたら対応する関数を呼び出す
+//actionのタイプによってstateを変化させるReducerを作るcreateReducerを作成(Reducerを用意する度にswitch文を何度も使いたくない)
 export default function createReducer(initialState, handlers) {
 	return function reducer(state = initialState, action) {
 		if (handlers.hasOwnProperty(action.type)) {
@@ -9,50 +9,73 @@ export default function createReducer(initialState, handlers) {
 }
 
 
-// reducerは、actionを受けてstateを変更するの為のメソッドです
-// 具体的には,イベント処理に応じてinitialStateをreturn!!
 
-/*  プログラムの説明
-　引数handlersがtypeプロパティーを持っている時、
-*/
+// [ActionTypes.ADD_TODO](state, action) {} is equivalent to [ActionTypes.ADD_TODO]: function(state, action) {}
+
+// reducerは、前のステートとアクションを受けてstateを変更するシンプルなメソッドです
+
+// https://javascript.tutorialhorizon.com/2016/07/23/create-reducer-for-redux-applications/
+
+// var o = new Object();
+
+// o.prop = 'exists';
+// o.hasOwnProperty('prop');              true を返す
+// o.hasOwnProperty('toString');          false を返す
+// o.hasOwnProperty('hasOwnProperty');    false を返す
 
 /*
-今後ActionTypeがどんどん増えていくとcaseが増えてSwitch分の中身が複雑になっていく
-export function todos(state = [], action) {
-  switch (action.type) {
-  case ActionTypes.ADD_TODO:
-    let text = action.text.trim()
-    return [ ...state, text ]
-  default:
-    return state
+https://javascript.tutorialhorizon.com/2016/07/23/create-reducer-for-redux-applications/
+
+function setSurveySuccess(state, action) {
+  return newState;
+}
+
+function setSurveyFail(state, action) {
+  return newState;
+}
+
+function currentSurveyReducer(state, action) {
+  switch(action.type) {
+    case 'CREATE_SURVEY':
+      return setSurveySuccess(state, action);
+    case 'CREATE_SURVEY_FAIL':
+      return setSurveyFail(state, action);
+    default:
+      return state;
   }
 }
-*/
+
+switch case文を連続するので、連続したコードを書くのを避けてくれるcreateReducer in redux-create-reducer 
+
+import { createReducer } from 'redux-create-reducer';
+
+function currentSurveyReducer = createReducer(state, {
+    'CREATE_SURVEY': setSurveySuccess,
+    'CREATE_SURVEY_FAIL': setSurveyFail
+});
 
 
-/*
-改善策:'二つに分ける!!'
-const ActionType = {
-  ADD_TODO: 'ADD_TODO',
-  TOGGLE_TODO: 'TOGGLE_TODO'
-}
+ちなみに、importしたcreateReducerの内容は、コードで書くと以下の内容
 
-// 任意の条件にマッチしたら対応する関数を呼び出す
-function createReducer (initialState, handlers) {
+function createReducer(initialState, handlers) {
   return function reducer(state = initialState, action) {
     if (handlers.hasOwnProperty(action.type)) {
-      return handlers[action.type](state, action);
+
+      //handlersオブジェクトがaction.typeプロパティを持つ時、第二引数のaction.typeプロパティに該当する値(例えばsetSurveySuccess,setSurveyFail)を返す
+      return handlers[action.type](state, action)
     } else {
-      return state;
+
+      //action.typeがないときは、第一引数の初期ステートを返す
+      return state
     }
   }
 }
-
-// 特定の条件と具体的な処理を実装し、上の関数に登録する
-const todoReducer = createReducer([], {
-  [ActionType.ADD_TODO] (state, action) {
-    const text = action.text.trim();
-    return [...state, text];
-  }
-});
 */
+
+
+
+
+
+
+
+

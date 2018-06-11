@@ -219,10 +219,23 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators(ActionCreators, dispatch);
+  return bindActionCreators(ActionCreators, dispatch); //bindしたら何度でも使える
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LogIn);
+
+/*
+func mapStateToProps(state) {
+	return {loggedIbStatus: state.loggedInStatus};
+}
+
+func mapDispatchToProps(dispatch) {
+	return {bindActionCreators(ActionCreators, dispatch)};  // bindActionCreatorsは自動的にマッピング
+}
+でも可!
+Action を追加するたびに connect に追加するのはたいへんなので、bindActionCreators を使って自動的にマッピングします。
+propsからthis.props.logInという風にlogInアクションを呼ぶことができる
+*/
 
 
 // connectの第一引数[mapStateToProps関数] storeからフィルタリング 

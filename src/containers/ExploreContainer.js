@@ -32,9 +32,9 @@ export default class InboxContainer extends Component {
     this.handleAddToFav = this.handleAddToFav.bind(this);
   }
 
-	handleAddToFav() {
+	handleAddToFav(listing) {
 		const { navigate } = this.props.navigation;
-		navigate('CreateList');
+		navigate('CreateList', {listing});
 	}
 
 	renderListings() {
@@ -97,4 +97,24 @@ const styles = StyleSheet.create({
     color: colors.gray04,
   }
 });
+
+
+/*
+navigate...Call this to link to another screen in your app
+
+navigation.navigate({routeName, params, action, key})
+navigation.navigate(routeName, params, action)
+
+routeName - A destination routeName that has been registered somewhere in the router
+params - Params to merge into the destination route
+action - (advanced) The sub-action to run in the child router, if the screen is a navigator. See Actions Doc for a full list of supported actions.
+key - Optional identifier of what route to navigate to. Navigate back to this route, if it already exists
+
+A screen has access to its route via this.props.navigation.state
+
+ https://reactnavigation.org/docs/en/params.html
+*/
+
+
+
 

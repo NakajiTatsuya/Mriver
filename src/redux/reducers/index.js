@@ -12,3 +12,5 @@ export default combineReducers(Object.assign(
 // 最後に、ReduxではcombineReducers()というユーティリティを提供しており、
 // combineReducerでは分割された子reducer名と同じキーのstateが使用されます。
 //子reducer [loggedInStatus]
+
+// LoggedOutReducerにNavigationReducerを結合してexport

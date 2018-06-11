@@ -33,10 +33,16 @@ export default class CreateList extends Component {
   	super(props);
 
   	this.state = {
-  		privacyOption: "private"
+  		privacyOption: "private",
+  		location: props.navigation.state.params.listing.location,
   	};
 
   	this.selectPrivacyOptions = this.selectPrivacyOptions.bind(this);
+  	this.handleOptionChange = this.handleOptionChange.bind(this);
+  }
+
+  handleOptionChange(location) {
+  	this.setState({ location });
   }
 
   selectPrivacyOptions(privacyOption) {
@@ -46,7 +52,8 @@ export default class CreateList extends Component {
   }
 
 	render() {
-		const { privacyOption } = this.state;
+		const { privacyOption, location } = this.state;
+		alert(location)
 		return(
 			<View style = {styles.wrapper}>
 			  <ScrollView style = {styles.scrollView}>
@@ -59,8 +66,8 @@ export default class CreateList extends Component {
 			          labelTextWeight = "400"
 			          labelColor = {colors.lightBlack}
 			          textColor = {colors.lightBlack}
-			          placeholder = "some text..."
-			          value = "some value..."
+			          placeholder = {location}
+			          value = {location}
 			          showCheckmark = {false}
 			          autoFocus = {true}
 			          inputType = "text"
@@ -205,7 +212,35 @@ const styles = StyleSheet.create({
 });
 
 
+/*
+Each screen component in your app is provided with the navigation prop automatically. It looks like this:
 
+this.props.navigation
+navigate - go to another screen, figures out the action it needs to take to do it
+goBack - close active screen and move back in the stack
+addListener - subscribe to updates to navigation lifecycle
+isFocused - function that returns true if the screen is focused and false otherwise.
+state - current state/routes
+setParams - make changes to route's params
+getParam - get a specific param with fallback
+dispatch - send an action to router
+
+
+this.props.navigation.state によりスクリーンのルートにアクセスする
+
+stateのプロパティはルート、キー、パラム
+{
+  // the name of the route config in the router
+  routeName: 'profile',
+  //a unique identifier used to sort routes
+  key: 'main0',
+  //an optional object of string options for this screen
+  params: { hello: 'world' }
+}
+
+this.props.navigation.stateはスクリーンのルートにアクセスする
+
+*/
 
 
 

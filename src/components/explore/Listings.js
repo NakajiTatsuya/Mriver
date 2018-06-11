@@ -47,7 +47,7 @@ export default class Listings extends Component {
 				  	<HeartButton 
 				  	  color = {colors.white}
 				  	  selectedColor = {colors.pink}
-				  	  onPress = {handleAddToFav}
+				  	  onPress = {() => handleAddToFav(listing)}
 				  	/>
 				  </View>
 				  	: null}
@@ -70,7 +70,7 @@ export default class Listings extends Component {
 				        color = {colors.green02} 
 				      />
 				    </View>
-				  </TouchableHighlight>
+				</TouchableHighlight>
 				  );
 		});
 	}

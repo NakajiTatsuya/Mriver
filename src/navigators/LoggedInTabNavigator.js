@@ -44,9 +44,19 @@ tabBarPosition: 'bottom',
 
  export default LoggedInTabNavigator;
 
-
 /*
 activeTintColor...tabBarのタッチされている時の色
 tabBarComponent: TabBarBottom を書かないとandroidの場合、デフォルトの
 レイアウトのTabBarになる
 */
+
+// !!!!!!!!!!!大事!!!!!!!!!!!
+// https://reactnavigation.org/docs/en/params.html
+//  <ルートを持つスタックナビゲータの作り方> and <ルート間でのnavigateの仕方>
+// this.props.navigation.navigate('RouteName', { /* params go here */ })
+// 1 navigation.navigateに関する第二引数のobjectの中にparamsを置くことによって、paramsをrouteに渡す
+// 2 screen componentのなかでparamsを読み込む
+
+
+
+
