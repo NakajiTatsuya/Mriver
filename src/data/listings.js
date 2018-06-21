@@ -15,7 +15,7 @@ const listings = [
 	    	stars: 29,
 	    },
 	    {
-	    	id: 1,
+	    	id: 2,
 	    	photo: require('./photos/listing2.png'),
 	    	type: 'CHEESE TASTING',
 	    	title: 'Funny cheesemonger takes you a Tour de Fromage',

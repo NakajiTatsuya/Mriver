@@ -290,7 +290,7 @@ connect([mapStateToProps], [mapDispatchToProps], [mergeProps], [options]) に関
 
 connect 第一引数　mapStateToProps... ここで指定した関数は,Storeからstateを取り出してComponentのPropsに割り当てる関数になる(storeのstateを使用できる)
 
-	(例)function mapStateToProps({ stateOfStore, tasks }){
+	(例)function mapStateToProps({ task, tasks }){
 		return {
 		stateOfStore,  // store の　state が　届く　{ task: ['勉強する'] }
 		tasks,  
@@ -336,7 +336,6 @@ mergePropsを用いることで、コンポーネントを介さずにstateを�
 		tasks,
 	    };
 	}
-
 	// dispatchを関数内で隠蔽
 	function mapDispatchToProps(dispatch) {
 		return {
@@ -344,20 +343,336 @@ mergePropsを用いることで、コンポーネントを介さずにstateを�
 		    dispatch(inputTask(task));  //取得したtaskのstateでactionをdispatch
 	      },
 	      addTask(task) {
-		    dispatch(addTask(task));   //actionをdispatch
+		    dispatch(addTask(task));    //actionをdispatch
 	      },
 	    };
 	}
-
+    // statePropsはmapStateToProps, dispatchPropsはmapDispatchToPropsを経た後のPropsと認識
 	function mergeProps(stateProps, dispatchProps, ownProps) {
 	const merge = {
-	  ...dispatchProps,
+	  ...dispatchProps, //  dispatchした全てのprops
 	  addTask() {
 		dispatchProps.addTask(stateProps.task);
 	  }
 	};
 			return Object.assign({}, ownProps, stateProps, merge);
 		} 
+
+***Redux Middleware***
+Redux Middleware...reduxの機能を拡張する仕組み.redux単体では提供していない機能を付け足すために、プラグイン機能で幅を広げる。
+例えば...
+・Actionのログを取るミドルウェア
+・非同期処理を可能にするミドルウェア
+・クラッシュれレポートを送信するミドルウェア
+・ルーティングのために利用するミドルウェア
+
+redux-logger <Actionのログを取るミドルウェア>
+dispatchされるActionと、その前後でのstateをコンソールに表示します。(actionの前後で期待した通りにstateが変化しているかを確認する)
+
+	(使用方法)
+	$ npm install --save redux-logger
+
+	// Middlewareのインポート
+	import { createStore, applyMiddleware } from 'redux';
+	import logger from 'redux-logger';
+
+	// 第二引数に使用する適用するMiddlewareを指定する applyMiddleware(使用するミドルウェア1,使用するミドルウェア2, 3, ... )
+	const store = createStore(reducer,applyMiddleware(logger)); 
+
+
+redux-loggerは設定オブジェクトを渡すことで,細かい表示設定を指定することができる
+
+	import { createStore, applyMiddleware } from 'redux';
+	import { createLogger } from 'redux-logger';  // 自分で表示設定を決めたいときは {createLogger}, デフォルトで良い場合は logger をimport
+
+    // 高頻度で発生するactionをログに落とさないように例外として指定
+	const loggerSetting = {
+		predicate: (getState, action) => action.type !== 'HIGH_FREQUENCY_ACTION'
+	};
+
+	// 設定を元にloggermiddlewareを作成
+	const logger = createLogger(loggerSetting);
+
+	const store = createStore(
+		reducer,
+		applyMiddleware(logger)
+		);
+
+createStoreの第二引数に初期Stateを加える場合、applyMiddlewareを第三引数に指定する
+(例) 
+
+      const store = createStore(
+	  reducer,
+	  { todoList: ['todo1', 'todo2'] },
+	  applyMiddleware(logger)
+	);
+
+createStoreの第二引数(あるいは第三引数)はReduxの機能を拡張するための関数 enhancer が入る(applyMiddleware は enhancer の一つ)
+もし、applyMiddleware以外のenhancerを使用する場合、第二引数には関数を一つしか入れることができないので、複数のenhancerを合成する。
+Reduxが提供しているcompose関数を使用
+
+    関数の合成
+    import { createStore, applyMiddleware, compose } from 'redux';
+	import logger from 'redux-logger';
+	import 'thirdPartyEnhancer' from 'thirdPartyLib'; 
+	const store = createStore(
+		reducer,
+		compose(
+			     applyMiddleware(logger),
+		         thirdPartyEnhancer)
+		)
+	);
+
+ミドルウェアはReduxのフローのActionがdispatchされたタイミングからreducerに処理が移るまでの間の処理を拡張する
+
+ミドルウェアの正体...
+
+const middleware = store => next => action => {
+	console.log('ここが「Actionがdispatchされたタイミングからreducerに処理が移るまでの間」です');
+	const result = next(action);
+	return result;
+}
+
+const middleware = function(store) {
+	return function(next) {
+	  return function(action) {
+	  console.log('ここが「Actionがdispatchされたタイミングからreducerに処理が移るまでの間」です');
+	  const result = next(action);
+	  return result;
+    }
+  }
+};
+
+
+###redux-navigation###
+react-navigationのStateをreduxで管理
+
+①  Navigationのコンポーネントを作成
+
+	import {
+	    StackNavigator
+	} from 'react-navigation';
+	import screens from './screens';
+	export default StackNavigator({
+	    Splash: {
+	        screen: screens.Splash,
+	        navigationOptions: {
+	            header: null,
+	        }
+	    },
+	    MainScreen: {
+	        screen: screens.MainScreen,
+	        navigationOptions: {
+	            title: 'メイン画面',
+	            headerBackTitle: null,
+	        }
+	    },
+	    DetailScreen: {
+	        screen: screens.EventScreen,
+	        navigationOptions: {
+	            title: '詳細画面',
+	        }
+	    }
+	})
+
+② NavigationのStateを加工するReducerを作成
+
+	import nav from './Navigation'; //(1)で作ったやつ
+	// 初期画面名を指定して初期ステートを作成
+	const initialState = nav.router.getStateForAction(nav.router.getActionForPathAndParams('Splash'));
+	export default (state = initialState, action) => {
+	  const nextState = nav.router.getStateForAction(action, state);
+	  return nextState || state;
+	};
+
+③ StoreにReducerを渡す
+
+	import navReducer from './reducers/navReducer';
+	const appReducer = combineReducers({
+	  nav: navReducer,
+	  ...
+	});
+
+④ ReduxとのConnect(コンテナ作成)
+
+	import React, { Component } from 'react';
+	import { bindActionCreators } from 'redux';
+	import { connect } from 'react-redux';
+	import { addNavigationHelpers } from 'react-navigation';
+	import Navigation from '../routes/Navigation'; //stackNavigatorを作ったファイル
+
+	class Nav extends Component {
+	  render() {
+	    // addNavigationHelpersが生成したnavigationが、
+	    // actionをdispatchしてくれて
+	    // reducerが新しいNavigationのStateを作って
+	    // 新しいStateでNavigationが更新されるという仕組み
+	    return (
+	      <Navigation
+	        navigation={addNavigationHelpers({
+	          dispatch: this.props.dispatch,
+	          state: this.props.nav,
+	        })}
+	      />
+	    );
+	  }
+	}
+	const mapStateToProps = (state, ownProps) => ({
+	  nav: state.nav
+	});
+	export default connect(mapStateToProps)(Nav);
+
+⑤ Providerの中でコンテナを使う
+
+	import React, { Component } from 'react';
+	import { Provider } from 'react-redux';
+	import store from './store';
+	import Navigation from './containers/NavigationContainer';
+	export default class App extends Component {
+	  render() {
+	    return (
+	      <Provider store={store}>
+	        <Navigation />
+	      </Provider>
+	    );
+	  }
+	}
+	// After the integration, you will be able to see the navigation state and actions inside your debugger's store.
+
+(https://qiita.com/kazuyuka76/items/6295e5ee282e5ba494a1)
+
+
+	import {
+	  createReactNavigationReduxMiddleware,
+	  createReduxBoundAddListener,
+	} from 'react-navigation-redux-helpers';
+	const navMiddleware = createReactNavigationReduxMiddleware(
+	  'root',
+	  state => state.navReducer,
+	);
+	const addListener = createReduxBoundAddListener('root');
+	export {
+	  navMiddleware,
+	  addListener,
+	};
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+react-native+redux+react-navigationのテンプレート
+制作時に編集するファイルと編集しなくていいファイルを完全に分離  https://qiita.com/shoichi1023/items/3aac40920d3348937d2b
+
+App.js　―　コンテナとなるファイル。ルートのコンポーネント
+navResucer.js　 ―　react-navigationのためのReducer
+pageNation.js　　―　react-navigationのnavigatorを作ってる場所。component(ページ)を登録する
+allReducer.js　―　reducerをまとめるためのファイル。reducerを作ったらここに登録
+
+↓　編集しないファイル　↓
+
+	App.js
+	import React from 'react';
+	import { addNavigationHelpers, } from 'react-navigation';
+	import { createReduxBoundAddListener, createReactNavigationReduxMiddleware, } from 'react-navigation-redux-helpers';
+	import { createStore, applyMiddleware, } from 'redux';
+	import { Provider, connect, } from 'react-redux';
+	import PageNation from './pageNation';
+	import allReducers from './allReducers';
+
+	//reduxとreact-navigationの橋渡し
+	const middleware = createReactNavigationReduxMiddleware(
+	    'root',
+	    state => state.nav,
+	  );
+
+	// storeを作成
+	const store = createStore(allReducers, applyMiddleware(middleware));
+
+	// ページ遷移命令を受け取るためのリスナー
+	const addListener = createReduxBoundAddListener('root');
+
+	// stateを各コンポーネントに渡すための枠組み
+	class App extends React.Component {
+	  render() {
+	    return (
+	      //container・・・ページ遷移のための枠組み
+	      <PageNation navigation={addNavigationHelpers({
+	        dispatch: this.props.dispatch,
+	        state: this.props.nav,
+	        addListener,
+	      })} />
+	    );
+	  }
+	}
+
+	//stateをAppコンポーネントに混ぜ込むときの形式を設定
+	const mapStateToProps = (state) => ({
+	  nav:state.nav,
+	});
+
+	//connect...stateやdispachを受け取る、受け渡す形式を決める
+	const Container = connect(mapStateToProps)(App);
+
+	//storeをAppに受け渡すための枠組み
+	class Root extends React.Component {
+	  render(){
+	    return (
+	        <Provider store={ store }>
+	          <Container />
+	        </Provider>
+	      );
+	  }
+	}
+	export default Root;
+
+navReducer.js
+
+	import PageNation, { rootCom } from './pageNation';
+	//現在のページのstateを取得
+	const navState = PageNation.router.getStateForAction(PageNation.router.getActionForPathAndParams(rootCom));
+	const navReducer = (state = navState, action) => {
+	//次のページのstateを取得
+	  const nextState = PageNation.router.getStateForAction(action,state);
+	//次のページがあればnextStateを、なければstateを返す
+	  return nextState || state;
+	};
+	export default navReducer
+
+
+↓　編集するファイル　↓
+
+pageNation.js
+
+	import { StackNavigator } from 'react-navigation';
+	export const rootCom = '';//ここにルート要素のキーを設定
+	//const rootCom = 'Page1';
+	const PageNation = StackNavigator({
+	  Page1: {
+	    screen: Page1,
+	  },
+	  Page2: {
+	    screen: Page2,
+	  },
+	});
+	export default PageNation;
+
+allReducer.js
+
+	import { combineReducers } from 'redux';
+	import navReducer from './navReducer';
+	//Reducerをまとめる
+	const allReducers = combineReducers({
+	  nav: navReducer,
+	  r1: reducer1,
+	  r2: reducer2,
+	        .
+	        .
+	        .
+	        .
+	});
+	export default allReducers
+
+
+
+
+
 
 
 

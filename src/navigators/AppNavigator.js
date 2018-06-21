@@ -15,6 +15,7 @@ export const AppNavigator = StackNavigator({
   TurnOnNotifications: { screen: TurnOnNotifications },
 });
 
+// stateを各コンポーネントに渡すための枠組み
 const AppWithNavigationState = ({ dispatch, nav, listener }) => (
 <AppNavigator navigation = {addNavigationHelpers({
   dispatch,
@@ -33,4 +34,21 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps)(AppWithNavigationState);
 
-
+/*
+  class Nav extends Component {
+    render() {
+      return (
+        <Navigation
+          navigation={addNavigationHelpers({
+            dispatch: this.props.dispatch,
+            state: this.props.nav,
+          })}
+        />
+      );
+    }
+  }
+  const mapStateToProps = (state, ownProps) => ({
+    nav: state.nav
+  });
+  export default connect(mapStateToProps)(Nav);
+  */

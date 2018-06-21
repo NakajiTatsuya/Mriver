@@ -34,7 +34,7 @@ export default class Listings extends Component {
 	}
 
 	renderListings() {
-		const { listings, showAddToFav, handleAddToFav } = this.props;
+		const { listings, showAddToFav, handleAddToFav, favoriteListings } = this.props;
 		return listings.map((listing, index) => {
 			return (
 				<TouchableHighlight
@@ -47,6 +47,7 @@ export default class Listings extends Component {
 				  	<HeartButton 
 				  	  color = {colors.white}
 				  	  selectedColor = {colors.pink}
+				  	  selected = {favoriteListings.indexOf(listing.id) > -1}
 				  	  onPress = {() => handleAddToFav(listing)}
 				  	/>
 				  </View>
@@ -110,6 +111,7 @@ Listings.propTypes = {
 	listings: PropTypes.array.isRequired,
 	showAddToFav: PropTypes.bool,
 	handleAddToFav: PropTypes.func,
+	favoriteListings: PropTypes.array,
 }
 
 const styles = StyleSheet.create({

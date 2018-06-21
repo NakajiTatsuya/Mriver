@@ -12,7 +12,7 @@ export const nav = (state = initialNavState, action) => {
 	if (action.routeName === 'TurnOnNotifications' || action.routeName === 'LoggedIn' ) {
 		StatusBar.setBarStyle('dark-content', true);
 	} 
-
+	
 	return nextState || state;
 };
 

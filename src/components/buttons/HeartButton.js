@@ -14,6 +14,7 @@ export default class HeartButton extends Component {
 		this.addToFavorite = this.addToFavorite.bind(this);
 	}
 
+	// Propが更新される時に呼ばれます 親Componentが渡したPropsの値が変化した時
 	componentWillReceiveProps(nextProps) {
 		this.setState({ addedToFavorite: nextProps.selected });
 	}
