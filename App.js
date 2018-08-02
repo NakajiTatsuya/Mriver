@@ -20,9 +20,3 @@ export default class App extends Component {
 ページ遷移命令を受け取るためのリスナー
 const addListener = createReduxBoundAddListener('root');
 */
-
-
-
-
-
-

@@ -16,7 +16,6 @@ export const nav = (state = initialNavState, action) => {
 	return nextState || state;
 };
 
-
 /*
 
 初期ステートと次のステートを返すreducer
