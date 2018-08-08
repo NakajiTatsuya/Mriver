@@ -53,7 +53,7 @@ export default class RadioInput extends Component {
 		return(
 			<View style = {[{backgroundColor: background, borderColor: border}, styles.wrapper]}>
 			  <Animated.View style = {[{transform: [{scale: iconScale}]}, styles.iconWrapper]}>
-			    <Icon 
+			    <Icon
 			      name = "md-checkmark"
 			      color = {iconColor}
 			      size = {20}

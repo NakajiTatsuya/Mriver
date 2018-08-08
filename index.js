@@ -4,5 +4,5 @@ import {
 } from 'react-native';
 import App from './App';
 
-StatusBar.setBarStyle('light-content', true);	
+StatusBar.setBarStyle('dark-content', true);
 AppRegistry.registerComponent('Mriver', () => App);

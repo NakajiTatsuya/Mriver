@@ -13,6 +13,8 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import RoundedButton from '../components/buttons/RoundedButton';
 import NavBarButton from '../components/buttons/NavBarButton';
 import iPhoneSize from '../helpers/utils';
+var { FBLogin, FBLoginManager } = require('react-native-facebook-login');
+var FB_PHOTO_WIDTH = 200;
 
 const size = iPhoneSize();
 let termsTextSize = 13;
@@ -25,6 +27,7 @@ if (size === 'small') {
 
 export default class LoggedOut extends Component {
 
+
 	static navigationOptions = ({ navigation }) => ({
 		headerRight: <NavBarButton handleButtonPress = {() => navigation.navigate('LogIn')} location = "right" color = {colors.white} text = "Log In" />,
 		headerStyle: transparentHeaderStyle,
@@ -33,6 +36,14 @@ export default class LoggedOut extends Component {
 
 	onFacebookPress() {
 		alert('Facebook button pressed');
+		FBLoginManager.setLoginBehavior(FBLoginManager.LoginBehaviors.SystemAccount);
+		FBLoginManager.loginWithPermissions(["email","user_friends","public_profile"], function(error, data){
+		  if (!error) {
+		    console.log("君は認証トークン(クッキー)を持ってるね!", data);
+		  } else {
+		    console.log("エラーだよ ", error);
+		  }
+		})
 	}
 
 	onCreateAccountPress() {
@@ -44,6 +55,7 @@ export default class LoggedOut extends Component {
 	}
 
 	render() {
+		var _this = this;
 		return (
 			<ScrollView style = {styles.wrapper} > 
 			<View style = {styles.welcomeWrapper}>
@@ -52,19 +64,20 @@ export default class LoggedOut extends Component {
 			style = {styles.logo}
 			/>
 			<Text style = {styles.welcomeText} >Welcome to M・river.</Text>
-			<RoundedButton 
+			<RoundedButton
 			text = "Continue with Facebook"
 			textColor = {colors.green01}
 			background = {colors.white} 
 			icon = {<Icon name = "facebook" size = {20} style = {styles.facebookButtonIcon}/>}
 			handleOnPress = {this.onFacebookPress}
+			disabled ={false}
 			/>
 			<RoundedButton 
 			text = "Create Account"
 			textColor = {colors.white}
 			handleOnPress = {this.onCreateAccountPress}
+			disabled ={false}
 			/>
-
 			<TouchableHighlight
 			  style = {styles.moreOptionsButton}
 			  onPress = {this.onMoreOptionsPress}
@@ -166,7 +179,4 @@ const styles = StyleSheet.create({
 700	Bold
 800	Extra Bold (Ultra Bold)
 900	Black (Heavy) 
-
-staticについて 
-https://medium.freecodecamp.org/where-do-i-belong-a-guide-to-saving-react-component-data-in-state-store-static-and-this-c49b335e2a00
 */
